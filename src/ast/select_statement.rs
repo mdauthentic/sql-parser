@@ -3,25 +3,17 @@ use crate::ast::join::{JoinCondition, JoinType};
 use crate::ast::table::Table;
 use crate::ast::Identifier;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SelectClause {
-    distinct: bool,
-    projection: Vec<Projection>,
-    from: Option<TableReference>,
-    where_exp: Option<Expression>,
-    group_by: Vec<Expression>,
-    having: Option<Expression>,
+    pub distinct: bool,
+    pub projection: Vec<Expression>,
+    pub from: Option<TableReference>,
+    pub where_exp: Option<Expression>,
+    pub group_by: Vec<Expression>,
+    pub having: Option<Expression>,
 }
 
-#[derive(Debug, Clone)]
-pub enum Projection {
-    WildCard,
-    QualifiedWildcard(Identifier),
-    UnnamedExpr(Expression),
-    AliasedExpr { expr: Expression, alias: Identifier },
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TableReference {
     BaseRelation(Table),
     SubQuery {
@@ -30,28 +22,28 @@ pub enum TableReference {
     },
     Join {
         left: Box<TableReference>,
-        right: Box<TableReference>,
         op: JoinType,
+        right: Box<TableReference>,
         cond: JoinCondition,
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct SelectStatement {
-    body: SelectClause,
+    pub body: SelectClause,
     /// e.g. ORDER BY FirstName ASC, LastName DESC
-    order_by: Vec<OrderBy>,
-    limit: Option<i64>,
-    offset: Option<i64>,
+    pub order_by: Vec<OrderBy>,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct OrderBy {
-    expr: Expression,
-    direction: Option<Order>,
+    pub expr: Vec<Expression>,
+    pub direction: Option<Order>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Order {
     Asc,
     Desc,

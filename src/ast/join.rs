@@ -1,7 +1,7 @@
 use crate::ast::expression::Expression;
 use crate::ast::Identifier;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum JoinType {
     Inner,
     LeftJoin,
@@ -10,7 +10,7 @@ pub enum JoinType {
     CrossJoin,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum JoinCondition {
     Using(Vec<Identifier>),
     On(Vec<Expression>),
