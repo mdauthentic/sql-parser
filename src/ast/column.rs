@@ -1,13 +1,12 @@
 use crate::ast::Identifier;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Column {
     pub column: Identifier,
     pub table: Option<Identifier>,
-    pub database: Option<Identifier>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct ColumnSpecification {
     pub column: Column,
     pub sql_type: String, // change to proper type
@@ -15,7 +14,7 @@ pub struct ColumnSpecification {
     pub comment: Option<String>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum ColumnConstraint {
     Unique,
     PrimaryKey,

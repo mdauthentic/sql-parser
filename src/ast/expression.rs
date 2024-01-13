@@ -1,95 +1,87 @@
 use crate::ast::column::Column;
-use crate::ast::select_statement::SelectStatement;
 use crate::ast::Identifier;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
-    /// An expression with a specific name.
-    Alias(Box<Expression>, String),
     /// A named reference to a qualified filed in a schema.
-    ColumnReference(Column),
+    ColumnReference(ColumnReference),
+    /// An expression with a specific name.
+    Alias {
+        expr: Box<Expression>,
+        alias: Identifier,
+    },
     /// A constant
     Literal(Literal),
-    /// type cast
-    Cast,
     /// A unary expression such as "-id"
-    UnaryExpr {
-        op: UnaryOp,
-        expr: Box<Expression>,
-    },
+    UnaryExpr { op: UnaryOp, expr: Box<Expression> },
     /// A binary expression e.g. "col = value"
     BinaryExpr {
         left: Box<Expression>,
         op: BinOp,
         right: Box<Expression>,
     },
-    SubQuery(Box<SelectStatement>),
+    //SubQuery(Box<SelectStatement>),
     FunctionExpression {
-        name: Identifier,
-        args: Vec<FunctionArgs>,
-        distinct: bool,
+        func: AggregationFunction,
+        args: Vec<Expression>,
     },
-    Exists(Box<SelectStatement>),
-    InSubQuery(Box<SelectStatement>),
     In {
-        expr: Box<Expression>,
-        args: Vec<Expression>,
-    },
-    NotIn {
-        expr: Box<Expression>,
-        args: Vec<Expression>,
+        /// Left hand side expression
+        left: Box<Expression>,
+        /// Right hand side expression
+        right: Vec<Expression>,
+        /// this represents "IN" or "NOT IN" depending on the predicate
+        not_in: bool,
     },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
+pub enum ColumnReference {
+    /// e.g. `*`
+    Wildcard,
+    /// e.g. `tbl.*`
+    QualifiedWildcard(Identifier),
+    /// table column
+    Column(Column),
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum Literal {
     Null,
     String(String),
-    UnsignedInteger(usize),
+    UnsignedInteger(i64),
     UnsignedFloat(f64),
-    DateTime,
+    Date(String),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BinOp {
     Addition,
-    Subtraction,
     Multiplication,
-    Division,
-    Mod,
     Gt,
     Lt,
+    Eq,
+    /* Subtraction,
+    Division,
+    Mod,
     GtEq,
     LtEq,
-    Eq,
     NotEq,
     And,
-    Or,
+    Or, */
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum UnaryOp {
-    Plus,
     Minus,
+    LogicalNot,
 }
 
-#[derive(Debug, Clone)]
-pub enum FunctionArgs {
-    Wildcard,
-    Expr(Expression),
-    AggregationFunction {
-        func: AggregationFunction,
-        expr: Expression,
-    },
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum AggregationFunction {
     Count,
-    CountStar,
-    CountDistinct,
     Sum,
-    Min,
-    Max,
     Avg,
+    Max,
+    Min,
 }

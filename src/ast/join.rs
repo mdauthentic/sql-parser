@@ -13,5 +13,5 @@ pub enum JoinType {
 #[derive(Debug, Clone)]
 pub enum JoinCondition {
     Using(Vec<Identifier>),
-    On(Box<Expression>),
+    On(Vec<Expression>),
 }
