@@ -70,10 +70,7 @@ pub fn expression() -> impl Parser<char, Expression, Error = Simple<char>> + Clo
                     .delimited_by(op("("), op(")")),
             )
             .map(|((exp, nt_kw), right)| {
-                let not_in = match nt_kw {
-                    Some(_) => true,
-                    None => false,
-                };
+                let not_in = nt_kw.is_some();
                 In {
                     left: Box::new(exp),
                     right,
@@ -145,20 +142,20 @@ pub fn literal() -> impl Parser<char, Literal, Error = Simple<char>> + Clone {
             }
         });
 
-    let date_literal = filter(|c: &char| c.is_digit(10))
+    let date_literal = filter(|c: &char| c.is_ascii_digit())
         .repeated()
         .exactly(4)
         .collect::<String>()
         .then_ignore(just::<_, _, Simple<char>>("-"))
         .then(
-            filter(|c: &char| c.is_digit(10))
+            filter(|c: &char| c.is_ascii_digit())
                 .repeated()
                 .exactly(2)
                 .collect::<String>(),
         )
         .then_ignore(just("-"))
         .then(
-            filter(|c: &char| c.is_digit(10))
+            filter(|c: &char| c.is_ascii_digit())
                 .repeated()
                 .exactly(2)
                 .collect::<String>(),
@@ -172,7 +169,7 @@ pub fn literal() -> impl Parser<char, Literal, Error = Simple<char>> + Clone {
     let string_literal = just('"')
         .ignore_then(text::ident())
         .then_ignore(just('"'))
-        .map(|s| Literal::String(s));
+        .map(Literal::String);
 
     choice((null_literal, date_literal, number, string_literal))
 }

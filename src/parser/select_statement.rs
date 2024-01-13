@@ -50,10 +50,7 @@ where
     let distinct_or_not = op("distinct")
         .or(op("DISTINCT"))
         .or_not()
-        .map(|dist| match dist {
-            Some(_) => true,
-            None => false,
-        });
+        .map(|dist| dist.is_some());
 
     let projection_clause = expr.clone().separated_by(just(","));
 
@@ -180,12 +177,12 @@ where
     let using_cond = op("using")
         .or(op("USING"))
         .ignore_then(identifier().separated_by(just(",")))
-        .map(|idents| JoinCondition::Using(idents));
+        .map(JoinCondition::Using);
 
     let on_cond = op("on")
         .or(op("ON"))
         .ignore_then(expr.separated_by(just(",")))
-        .map(|expr| JoinCondition::On(expr));
+        .map(JoinCondition::On);
 
     using_cond.or(on_cond)
 }
